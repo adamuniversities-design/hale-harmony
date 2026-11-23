@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Beheer – Hale Harmony</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;1,300&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#F8F3ED;--lav:#EDE5F2;--lil:#D8CBE5;--card:#fffdfa;--ink:#2f2a42;--mute:#5f5a70;--pur:#4b3f72;--sage:#A6AA83;--sand:#D9C9B4;--ok:#5d7a4a;--warn:#b0802f;--bad:#9b3b3b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.55 Inter,system-ui,sans-serif}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:400;margin:0}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 28px;background:var(--card);border-bottom:1px solid var(--lil)}
+header b{font:400 1.4rem Fraunces,serif}header span{color:var(--mute);margin-left:10px;font-size:.85rem}
+button{font:inherit;cursor:pointer}.btn{border:0;border-radius:999px;padding:.6rem 1.2rem;background:var(--pur);color:#fff;font-weight:600}.btn.g{background:none;border:1.5px solid var(--lil);color:var(--ink)}.btn.r{background:var(--bad)}.btn.o{background:var(--ok)}.btn:disabled{opacity:.5}
+#login{max-width:380px;margin:12vh auto;background:var(--card);border:1px solid var(--lil);border-radius:24px;padding:36px}#login h1{font-size:2rem;margin-bottom:6px}
+input{font:inherit;width:100%;padding:.8rem 1rem;border:1.5px solid var(--lil);border-radius:12px;margin:14px 0}
+#err{color:var(--bad);min-height:1.4em;font-weight:600}
+#app{display:none;grid-template-columns:1fr 340px;gap:24px;padding:24px 28px;align-items:start}
+.nav{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}.nav h2{font-size:1.5rem;flex:1;min-width:220px}
+.grid{display:grid;grid-template-columns:64px repeat(5,1fr);gap:6px}
+.dh{text-align:center;padding:6px 2px;font-weight:600;background:var(--lav);border-radius:12px}.dh small{display:block;font-weight:400;color:var(--mute)}.dh button{margin-top:4px;font-size:.75rem;border:0;background:none;color:var(--pur);text-decoration:underline}
+.tl{font-size:.82rem;color:var(--mute);padding-top:12px;text-align:right;padding-right:6px}
+.cell{min-height:62px;border-radius:12px;border:1.5px dashed var(--lil);background:var(--card);padding:6px 8px;text-align:left;color:var(--mute);font-size:.8rem;overflow:hidden}
+.cell.em:hover{background:var(--lav);border-style:solid}.cell.em::after{content:"+";opacity:0}.cell.em:hover::after{opacity:1}
+.cell.bl{background:repeating-linear-gradient(45deg,var(--lav) 0 8px,#fff 8px 10px);border:1.5px solid var(--lil);color:var(--mute)}
+.cell.bk{border:1.5px solid;color:var(--ink);font-weight:500}.cell.bk b{display:block;font-weight:600;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.cell.pending{background:#fbf0d9;border-color:var(--warn)}.cell.confirmed{background:#e3eed9;border-color:var(--ok)}
+.side section{background:var(--card);border:1px solid var(--lil);border-radius:20px;padding:18px;margin-bottom:18px}.side h3{font-size:1.25rem;margin-bottom:10px}
+.it{border-top:1px solid var(--lil);padding:10px 0;display:grid;gap:6px}.it:first-of-type{border-top:0}.it .row{display:flex;gap:8px}.it .row .btn{padding:.4rem .9rem;font-size:.82rem}.it a{color:var(--pur)}.mt{color:var(--mute);font-size:.85rem}
+.leg{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--mute);margin-top:12px}.leg i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:6px;vertical-align:-1px}
+dialog{border:0;border-radius:24px;padding:28px;max-width:480px;width:calc(100% - 32px);box-shadow:0 30px 80px rgba(47,42,66,.35)}dialog::backdrop{background:rgba(47,42,66,.45)}
+dialog dl{display:grid;grid-template-columns:110px 1fr;gap:8px 14px;margin:16px 0}dialog dt{color:var(--mute)}dialog dd{margin:0;overflow-wrap:anywhere}dialog .row{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:1000px){#app{grid-template-columns:1fr;padding:16px}.grid{grid-template-columns:44px repeat(5,minmax(78px,1fr));overflow-x:auto}.cal{overflow-x:auto}}
+</style></head><body>
+<header><div><b>Hale Harmony</b><span>Beheer</span></div><button class="btn g" id="out" hidden>Uitloggen</button></header>
+<form id="login"><h1>Inloggen</h1><p class="mt">Alleen voor Dilara.</p><input type="password" id="pw" placeholder="Wachtwoord" autocomplete="current-password" required><div id="err" role="alert"></div><button class="btn" style="width:100%">Inloggen</button></form>
+<main id="app"><div class="cal"><div class="nav"><h2 id="wt"></h2><button class="btn g" id="pv">‹</button><button class="btn g" id="td">Vandaag</button><button class="btn g" id="nx">›</button></div><div class="grid" id="g"></div>
+<div class="leg"><span><i style="background:#fbf0d9;border:1.5px solid var(--warn)"></i>Aanvraag</span><span><i style="background:#e3eed9;border:1.5px solid var(--ok)"></i>Bevestigd</span><span><i style="background:var(--lav);border:1.5px solid var(--lil)"></i>Niet beschikbaar</span><span>Klik op een leeg vak om het niet beschikbaar te maken, klik nogmaals om het vrij te geven.</span></div></div>
+<aside class="side"><section><h3>Nieuwe aanvragen</h3><div id="pl"></div></section><section><h3>Komende afspraken</h3><div id="cl"></div></section></aside></main>
+<dialog id="dg"></dialog>
+<script>
+const T=["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00"],$=i=>document.getElementById(i);
+let tok=sessionStorage.getItem('t'),db={bookings:[],blocks:[]},tm=null;
+const nl=()=>{const p={};for(const x of new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',year:'numeric',month:'2-digit',day:'2-digit',hourCycle:'h23'}).formatToParts(new Date()))p[x.type]=x.value;return p.year+'-'+p.month+'-'+p.day};
+const add=(d,n)=>{const x=new Date(d+'T12:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10)};
+const mon=d=>add(d,-((new Date(d+'T12:00:00Z').getUTCDay()+6)%7));
+const fm=(d,o)=>new Intl.DateTimeFormat('nl-NL',Object.assign({timeZone:'UTC'},o)).format(new Date(d+'T12:00:00Z'));
+let wk=mon(nl());
+function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+async function api(p,b){const r=await fetch('/api'+p,{method:b?'POST':'GET',headers:Object.assign({'Content-Type':'application/json'},tok?{Authorization:'Bearer '+tok}:{}),body:b?JSON.stringify(b):undefined});if(r.status===401&&p!=='/admin/login'){out();throw new Error('Sessie verlopen')}const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Er ging iets mis');return j}
+function out(){tok=null;sessionStorage.removeItem('t');clearInterval(tm);$('app').style.display='none';$('login').style.display='';$('out').hidden=true}
+async function load(){db=await api('/admin/data');draw()}
+async function act(p,b){try{await api(p,b);await load()}catch(e){alert(e.message)}}
+const bk=(d,t)=>db.bookings.find(b=>b.date===d&&b.time===t&&b.status!=='declined');
+const blk=(d,t)=>db.blocks.find(z=>z.date===d&&(z.time==null||z.time===t));
+function draw(){
+ $('wt').textContent=fm(wk,{day:'numeric',month:'long'})+' – '+fm(add(wk,4),{day:'numeric',month:'long',year:'numeric'});
+ const g=$('g');g.textContent='';g.append(el('div'));
+ for(let i=0;i<5;i++){const d=add(wk,i),h=el('div','dh',fm(d,{weekday:'short'}));h.append(el('small','',fm(d,{day:'numeric',month:'short'})));
+  const full=db.blocks.some(z=>z.date===d&&z.time==null),bt=el('button','',full?'Dag vrijgeven':'Dag blokkeren');bt.onclick=()=>act(full?'/admin/unblock':'/admin/block',{date:d,time:null});
+  h.append(bt);g.append(h)}
+ T.forEach(t=>{g.append(el('div','tl',t));for(let i=0;i<5;i++){const d=add(wk,i),b=bk(d,t),z=blk(d,t);let c;
+  if(b){c=el('button','cell bk '+b.status);c.append(el('b','',b.naam),el('span','',b.status==='pending'?'Aanvraag':'Bevestigd'));c.onclick=()=>show(b)}
+  else if(z){c=el('button','cell bl','Niet beschikbaar');c.onclick=()=>act('/admin/unblock',{date:d,time:z.time==null?null:t})}
+  else{c=el('button','cell em');c.setAttribute('aria-label','Maak '+d+' '+t+' niet beschikbaar');c.onclick=()=>act('/admin/block',{date:d,time:t})}
+  g.append(c)}});
+ const today=nl(),P=db.bookings.filter(b=>b.status==='pending').sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)),C=db.bookings.filter(b=>b.status==='confirmed'&&b.date>=today).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,10);
+ const fill=(box,L,pend)=>{box.textContent='';if(!L.length){box.append(el('p','mt',pend?'Geen nieuwe aanvragen.':'Nog geen bevestigde afspraken.'));return}
+  L.forEach(b=>{const r=el('div','it');r.append(el('strong','',b.naam),el('span','mt',fm(b.date,{weekday:'long',day:'numeric',month:'long'})+' · '+b.time));
+   const row=el('div','row'),v=el('button','btn g','Details');v.onclick=()=>show(b);row.append(v);
+   if(pend){const o=el('button','btn o','Bevestig');o.onclick=()=>act('/admin/status',{id:b.id,status:'confirmed'});const n=el('button','btn r','Afwijzen');n.onclick=()=>act('/admin/status',{id:b.id,status:'declined'});row.append(o,n)}
+   r.append(row);box.append(r)})};
+ fill($('pl'),P,true);fill($('cl'),C,false)}
+function show(b){const d=$('dg');d.textContent='';d.append(el('h3','',b.naam),el('p','mt',fm(b.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'})+' om '+b.time+' ('+(b.status==='pending'?'aanvraag':b.status==='confirmed'?'bevestigd':'afgewezen')+')'));
+ const dl=el('dl'),row=(k,v,a)=>{if(!v)return;dl.append(el('dt','',k));const dd=el('dd');if(a){const l=el('a','',v);l.href=a;dd.append(l)}else dd.textContent=v;dl.append(dd)};
+ row('E-mail',b.email,'mailto:'+b.email);row('Telefoon',b.telefoon,b.telefoon?'tel:'+b.telefoon.replace(/[^\d+]/g,''):null);row('Contact via',b.contactvoorkeur);row('Onderwerp',(b.onderwerp||[]).join(', '));row('Vorm',b.vorm);row('Toelichting',b.toelichting);row('Ontvangen',new Date(b.createdAt).toLocaleString('nl-NL'));
+ d.append(dl);const r=el('div','row'),mk=(t,c,f)=>{const x=el('button','btn '+c,t);x.onclick=async()=>{d.close();await f()};r.append(x)};
+ if(b.status!=='confirmed')mk('Bevestigen','o',()=>act('/admin/status',{id:b.id,status:'confirmed'}));
+ if(b.status!=='declined')mk('Afwijzen','r',()=>act('/admin/status',{id:b.id,status:'declined'}));
+ mk('Verwijderen','g',()=>confirm('Deze aanvraag definitief verwijderen?')&&act('/admin/delete',{id:b.id}));
+ const c=el('button','btn g','Sluiten');c.onclick=()=>d.close();r.append(c);d.append(r);d.showModal()}
+async function start(){$('login').style.display='none';$('app').style.display='grid';$('out').hidden=false;try{await load();tm=setInterval(()=>load().catch(()=>{}),60000)}catch(e){}}
+$('login').onsubmit=async e=>{e.preventDefault();$('err').textContent='';try{const j=await api('/admin/login',{password:$('pw').value});tok=j.token;sessionStorage.setItem('t',tok);$('pw').value='';start()}catch(x){$('err').textContent=x.message}};
+$('out').onclick=out;$('pv').onclick=()=>{wk=add(wk,-7);draw()};$('nx').onclick=()=>{wk=add(wk,7);draw()};$('td').onclick=()=>{wk=mon(nl());draw()};
+if(tok)start();
+</script></body></html>
